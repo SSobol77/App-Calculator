@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">claculator</string>
+    <string name="app_name">Calculator Click*Click</string>
+    <string name="toast_message">Forbidden action!</string>
+
 </resources>

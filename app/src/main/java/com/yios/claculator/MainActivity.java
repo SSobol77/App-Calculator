@@ -3,16 +3,29 @@ package com.yios.claculator;
  * @SSobolewski
  */
 
-import androidx.annotation.NonNull;
+
 import androidx.appcompat.app.AppCompatActivity;
 
+
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.Toast;
+
+import com.google.android.gms.ads.AdRequest;
+import com.google.android.gms.ads.AdView;
+import com.google.android.gms.ads.MobileAds;
+import com.google.android.gms.ads.initialization.InitializationStatus;
+import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+
 
 public class MainActivity extends AppCompatActivity {
 
-    // input variable:
+    private AdView mAdView;
+
+    //MediaPlayer mediaPlayer; // zmienna dzwieku
+
     EditText editText;
     Boolean delZero = true;
     String oldNumber;
@@ -22,12 +35,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        MobileAds.initialize(this, new OnInitializationCompleteListener() {
+            @Override
+            public void onInitializationComplete(InitializationStatus initializationStatus) {
+            }
+        });
+        //block reklamowy
+        mAdView = findViewById(R.id.adView);
+        AdRequest adRequest = new AdRequest.Builder().build();
+        mAdView.loadAd(adRequest);
+
+        //mediaPlayer = MediaPlayer.create(this, R.raw.sound_click);
 
         editText = findViewById(R.id.editText);
     }
 
     //method push on number :
     public void clickNumber(View view) {
+        //mediaPlayer.start();
         if (delZero)
             editText.setText("");
         delZero = false;
@@ -105,10 +130,10 @@ public class MainActivity extends AppCompatActivity {
                 }
                 break;
 
-
+            // kropka
             case R.id.butDot:
                 if (dotIsPresent(number)) {
-                }
+                }else
                 if (zeroIsFirst(number)) {
                     number = "0.";
                 }
@@ -147,6 +172,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean numberIsZero(String number) {
+
         if (number.equals("0") || number.equals("")) {
             return true;
         } else {
@@ -155,6 +181,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private boolean minusIsPresent(String number) {
+        //mediaPlayer.start();
         if (number.charAt(0) == '-') {
             return true;
         } else {
@@ -163,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void operation(View view) {
+        //mediaPlayer.start();
         delZero = true;
         oldNumber = editText.getText().toString();
         switch (view.getId()) {
@@ -182,31 +210,41 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void clickResult(View view) {
+        //mediaPlayer.start();
         String newNumber = editText.getText().toString();
         Double result = 0.0;
-        switch (operator) {
-            case "-":
-                result = Double.parseDouble(oldNumber) - Double.parseDouble(newNumber);
-                break;
-            case "+":
-                result = Double.parseDouble(oldNumber) + Double.parseDouble(newNumber);
-                break;
-            case "*":
-                result = Double.parseDouble(oldNumber) * Double.parseDouble(newNumber);
-                break;
-            case "/":
-                result = Double.parseDouble(oldNumber) / Double.parseDouble(newNumber);
-                break;
+
+        // divide by 0 does not:
+        if(newNumber.equals("0") && operator=="/" || newNumber.equals("") && operator=="/"){
+            Toast.makeText(MainActivity.this,R.string.toast_message, Toast.LENGTH_SHORT);
+        }else{
+            //operation math:
+            switch (operator) {
+                case "-":
+                    result = Double.parseDouble(oldNumber) - Double.parseDouble(newNumber);
+                    break;
+                case "+":
+                    result = Double.parseDouble(oldNumber) + Double.parseDouble(newNumber);
+                    break;
+                case "*":
+                    result = Double.parseDouble(oldNumber) * Double.parseDouble(newNumber);
+                    break;
+                case "/":
+                    result = Double.parseDouble(oldNumber) / Double.parseDouble(newNumber);
+                    break;
+            }
+            editText.setText(result + "");
         }
-        editText.setText(result + "");
     }
 
     public void clickAC(View view) {
+        //mediaPlayer.start();
         editText.setText("0");
         delZero = true; // delete zero
     }
 
     private boolean dotIsPresent(String number) {
+
         // Log.i("ind", "index point: " + number.indexOf("."));
         // return true;
         if (number.indexOf(".") == -1) {
